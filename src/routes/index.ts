@@ -6,9 +6,8 @@ import cors from 'cors'
 const { Router } = express
 const api = Router()
 
-const donation = {
-  user: 0,
-  amount: 0
+const exceldata = {
+  filename: '',
 };
 
 // internal middleware
@@ -24,14 +23,11 @@ api.get('/_health', (req, res) => {
   res.sendStatus(200)
 })
 
-// '/api/donate'
-api.post('/donate', (req, res) => {
-  const amount = req.body.amount || 0;
+// '/api/excelreport'
+api.post('/excelreport', (req, res) => {
+  const filename = req.body.filename || 0;
 
-  if (amount > 0) {
-    donation.amount += amount;
-    donation.user += 1;
-  }
+  exceldata.filename += filename;
 
   return res.json({ message: 'Thank you 🙏 ' });
 })
@@ -53,13 +49,13 @@ const sendEvent = (_req: Request, res: Response) => {
   const sseId = new Date().toDateString();
 
   setInterval(() => {
-    writeEvent(res, sseId, JSON.stringify(donation));
+    writeEvent(res, sseId, JSON.stringify(exceldata));
   }, SEND_INTERVAL);
 
-  writeEvent(res, sseId, JSON.stringify(donation));
+  writeEvent(res, sseId, JSON.stringify(exceldata));
 };
 
-api.get('/dashboard', (req: Request, res: Response) => {
+api.get('/notifyexcel', (req: Request, res: Response) => {
   if (req.headers.accept === 'text/event-stream') {
     sendEvent(req, res);
   } else {
